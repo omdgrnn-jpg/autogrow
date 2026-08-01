@@ -4556,18 +4556,20 @@ end
                         -- Top priority — stop drink
                         character:SetAttribute('_drinkingToFull', false)
 
-                        local hum = character:FindFirstChild("Humanoid")
+                          local hum = character:FindFirstChild("Humanoid")
                         Animal.CancelTween(true)
 
-                        -- TP with RAGDOLL to carcass location (prevents anti-cheat teleport back)
+                        -- Walk to carcass — no teleport, no fling
                         local cPos = cRoot.Position
-                        local standPos = Vector3.new(cPos.X, cPos.Y + 2, cPos.Z)
-                        ragdollTeleportToPos(character, standPos)
-                        task.wait(0.4)
+                        local walkGoal = CFrame.new(Vector3.new(cPos.X, cPos.Y, cPos.Z))
+                        Animal.TweenToAsync(walkGoal)
+                        task.wait(0.3)
 
-                        -- Anchor briefly so we can't slide off the carcass on slopes (Jungle Life)
-                        local anchorRoot = character:FindFirstChild("HumanoidRootPart")
-                        if anchorRoot then anchorRoot.Anchored = true end
+                        -- Upright before eating
+                        if hum then
+                            hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+                            task.wait(0.3)
+                        end
 
                         -- Upright before eating
                         if hum then
@@ -6591,7 +6593,7 @@ end
         if not growth then return end
 
         -- 100% grown
-        if growth >= 0.999 and lastGrowth >= 0.85
+        if growth >= 0.999 and lastGrowth >= 0.85 then
             local bothOn = growExistingSlots and growNewSlots
 
             if parkingMode then
