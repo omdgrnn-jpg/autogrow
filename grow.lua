@@ -4423,28 +4423,17 @@ do
                                 root.Anchored = false
                                 hum:ChangeState(Enum.HumanoidStateType.Physics)
                                 for _ = 1, 25 do
-                                local r = character:FindFirstChild("HumanoidRootPart")
-                                if r then
-                                 r.Anchored = true
-                                 r.AssemblyLinearVelocity = Vector3.zero
-                                r.AssemblyAngularVelocity = Vector3.zero
-                                character:SetPrimaryPartCFrame(CFrame.new(targetPos))
+                                    if character and character:FindFirstChild("HumanoidRootPart") then
+                                        character:SetPrimaryPartCFrame(CFrame.new(targetPos))
+                                    end
+                                    task.wait()
                                 end
-                        task.wait()
-                    end 
                                 task.wait(1)
-                                local zeroRoot = character:FindFirstChild("HumanoidRootPart")
-if zeroRoot then
-    zeroRoot.AssemblyLinearVelocity = Vector3.zero
-    zeroRoot.AssemblyAngularVelocity = Vector3.zero
-end
-hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-for _ = 1, 10 do
-    character:SetAttribute("MovementDisabled", false)
-    task.wait(0.1)
-end
-
--- Verify position
+                                hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+                                for _ = 1, 10 do
+                                    character:SetAttribute("MovementDisabled", false)
+                                    task.wait(0.1)
+                                end
                                 -- Verify position
                                 local r = character:FindFirstChild("HumanoidRootPart")
                                 if r then
@@ -4483,7 +4472,7 @@ end
                         -- 100% GROWTH BLOCK: stop teleporting to carcasses once fully grown.
                         -- Growth loop will handle the war-spawn TP / reset cycle from here.
                         local growth = character:GetAttribute("GrowthPercentage") or 0
-                        if growth >= 0.999 then
+                        if growth >= 1 then
                             return false
                         end
 
@@ -4556,20 +4545,18 @@ end
                         -- Top priority — stop drink
                         character:SetAttribute('_drinkingToFull', false)
 
-                          local hum = character:FindFirstChild("Humanoid")
+                        local hum = character:FindFirstChild("Humanoid")
                         Animal.CancelTween(true)
 
-                        -- Walk to carcass — no teleport, no fling
+                        -- TP with RAGDOLL to carcass location (prevents anti-cheat teleport back)
                         local cPos = cRoot.Position
-                        local walkGoal = CFrame.new(Vector3.new(cPos.X, cPos.Y, cPos.Z))
-                        Animal.TweenToAsync(walkGoal)
-                        task.wait(0.3)
+                        local standPos = Vector3.new(cPos.X, cPos.Y + 2, cPos.Z)
+                        ragdollTeleportToPos(character, standPos)
+                        task.wait(0.4)
 
-                        -- Upright before eating
-                        if hum then
-                            hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-                            task.wait(0.3)
-                        end
+                        -- Anchor briefly so we can't slide off the carcass on slopes (Jungle Life)
+                        local anchorRoot = character:FindFirstChild("HumanoidRootPart")
+                        if anchorRoot then anchorRoot.Anchored = true end
 
                         -- Upright before eating
                         if hum then
@@ -4628,7 +4615,7 @@ end
                             end
 
                             -- Both conditions met: food rising AND not in a ragdolled state
-                            if curHum and foodRose and not RAGDOLL_STATES[curHum:GetState()] and (curFood > startFood + 2) then
+                            if curHum and foodRose and not RAGDOLL_STATES[curHum:GetState()] then
                                 local relRoot = curChar:FindFirstChild("HumanoidRootPart")
                                 if relRoot then
                                     Animal.CancelTween(true)
@@ -4758,14 +4745,14 @@ end
                     -- never drags a finished slot into water. Parking mode is the
                     -- one exception because AFK passive-coin farming needs drink on.
                     local growth = character:GetAttribute("GrowthPercentage") or 0
-                    if growth >= 0.999 and not shared._parkingModeActive then
+                    if growth >= 1 and not shared._parkingModeActive then
                         character:SetAttribute('_drinkingToFull', false)
                         return false
                     end
 
                     -- Savannah can wait longer; Jungle keeps the safer early drink trigger.
                     local water = character:GetAttribute('Water') or 0
-                    local drinkTrigger = 85
+                    local drinkTrigger = shared._growthGameName == "SavannahLife" and 55 or 90
                     if water <= drinkTrigger then
                         character:SetAttribute('_drinkingToFull', true)
                     end
@@ -6058,12 +6045,8 @@ task.spawn(function()
         task.wait(0.5)
         -- Unanchor AFTER position is confirmed
         local finalRoot = character:FindFirstChild("HumanoidRootPart")
-        if finalRoot then
-        finalRoot.AssemblyLinearVelocity = Vector3.zero
-        finalRoot.AssemblyAngularVelocity = Vector3.zero
-        finalRoot.Anchored = false
-    end
-hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+        if finalRoot then finalRoot.Anchored = false end
+        hum:ChangeState(Enum.HumanoidStateType.GettingUp)
         for _ = 1, 10 do
             character:SetAttribute("MovementDisabled", false)
             task.wait(0.1)
@@ -6091,15 +6074,11 @@ hum:ChangeState(Enum.HumanoidStateType.GettingUp)
                 root.Anchored = false
                 hum:ChangeState(Enum.HumanoidStateType.Physics)
                 for _ = 1, 25 do
-    local r = character:FindFirstChild("HumanoidRootPart")
-    if r then
-        r.Anchored = true
-        r.AssemblyLinearVelocity = Vector3.zero
-        r.AssemblyAngularVelocity = Vector3.zero
-        character:SetPrimaryPartCFrame(CFrame.new(targetPos))
-    end
-    task.wait()
-end
+                    if character and character:FindFirstChild("HumanoidRootPart") then
+                        character:SetPrimaryPartCFrame(CFrame.new(targetPos))
+                    end
+                    task.wait()
+                end
                 task.wait(1)
                 hum:ChangeState(Enum.HumanoidStateType.GettingUp)
                 for _ = 1, 10 do
@@ -6181,11 +6160,6 @@ end
         -- Wait 7s for character to fully settle
         print("[GrowthLoop] Waiting 7s for character to settle...")
         task.wait(7)
-        local settleRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-        if settleRoot then
-        settleRoot.AssemblyLinearVelocity = Vector3.zero
-        settleRoot.AssemblyAngularVelocity = Vector3.zero
-    end
 
         -- OFF -> ON -> OFF -> ON  (double-cycle clears any stuck state)
         -- For carnivores: toggle auto eat CARCASS instead of auto eat grass
@@ -6384,7 +6358,7 @@ end
             -- Check current slot growth — if not 100%, grow existing first
             local ch = player.Character
             local growth = ch and ch:GetAttribute("GrowthPercentage")
-            if growth and growth < 1 then
+            if growth and growth < 0.999 then
                 print(string.format("[GrowthLoop] [Park] Current slot not full (%.0f%%) — growing existing first", growth * 100))
                 setParkingModeState(false)
                 growExistingSlots = true
@@ -6452,7 +6426,7 @@ end
             local ch = player.Character
             if ch then
                 local growth = waitForAttribute(ch, "GrowthPercentage", 8)
-                if growth and growth >= 0.999 then
+                if growth and growth >= 1 then
                     print("[GrowthLoop] [Existing] Slot", slotName, "already 100%, skipping")
                     return
                 end
@@ -6885,7 +6859,7 @@ end
     -- auto eat carcass). Cycles AUTO EAT CARCASS + AUTO DRINK only, never auto eat.
     -- ============================================================
     task.spawn(function()
-        local LOW_THRESHOLD  = 55   -- % that triggers the kick
+        local LOW_THRESHOLD  = 40   -- % that triggers the kick
         local RECHECK_WAIT   = 15   -- seconds to wait before re-checking
         local inCycle        = false -- prevent overlapping cycles
 
