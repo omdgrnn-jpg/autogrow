@@ -4472,7 +4472,7 @@ do
                         -- 100% GROWTH BLOCK: stop teleporting to carcasses once fully grown.
                         -- Growth loop will handle the war-spawn TP / reset cycle from here.
                         local growth = character:GetAttribute("GrowthPercentage") or 0
-                        if growth >= 1 then
+                        if growth >= 0.999 then
                             return false
                         end
 
@@ -4745,7 +4745,7 @@ do
                     -- never drags a finished slot into water. Parking mode is the
                     -- one exception because AFK passive-coin farming needs drink on.
                     local growth = character:GetAttribute("GrowthPercentage") or 0
-                    if growth >= 1 and not shared._parkingModeActive then
+                    if growth >= 0.999 and not shared._parkingModeActive then
                         character:SetAttribute('_drinkingToFull', false)
                         return false
                     end
@@ -6324,7 +6324,7 @@ task.spawn(function()
             local ch = player.Character
             if ch then
                 local growth = waitForAttribute(ch, "GrowthPercentage", 8)
-                if growth and growth >= 1 then
+                if growth and growth >= 0.999 then
                     print("[GrowthLoop] [Existing] Slot", slotName, "already 100%, skipping")
                     return
                 end
@@ -6426,7 +6426,7 @@ task.spawn(function()
             local ch = player.Character
             if ch then
                 local growth = waitForAttribute(ch, "GrowthPercentage", 8)
-                if growth and growth >= 1 then
+                if growth and growth >= 0.999 then
                     print("[GrowthLoop] [Existing] Slot", slotName, "already 100%, skipping")
                     return
                 end
@@ -6567,7 +6567,7 @@ task.spawn(function()
         if not growth then return end
 
         -- 100% grown
-        if growth >= 1 and lastGrowth >= 0.9 then
+        if growth >= 0.999 and lastGrowth >= 0.85
             local bothOn = growExistingSlots and growNewSlots
 
             if parkingMode then
@@ -6826,7 +6826,7 @@ task.spawn(function()
                             currentAnimalName = animal
                             currentGender = gender
                             currentSkin = skin
-                            if g and g >= 1 then
+                            if g and g >= 0.999 then
                                 print("[Watchdog] Recovered slot already 100% — triggering next cycle")
                                 if growExistingSlots then
                                     task.spawn(doExistingSlotCycle)
