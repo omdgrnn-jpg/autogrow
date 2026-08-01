@@ -4423,11 +4423,15 @@ do
                                 root.Anchored = false
                                 hum:ChangeState(Enum.HumanoidStateType.Physics)
                                 for _ = 1, 25 do
-                                    if character and character:FindFirstChild("HumanoidRootPart") then
-                                        character:SetPrimaryPartCFrame(CFrame.new(targetPos))
-                                    end
-                                    task.wait()
+                                local r = character:FindFirstChild("HumanoidRootPart")
+                                if r then
+                                 r.Anchored = true
+                                 r.AssemblyLinearVelocity = Vector3.zero
+                                r.AssemblyAngularVelocity = Vector3.zero
+                                character:SetPrimaryPartCFrame(CFrame.new(targetPos))
                                 end
+                        task.wait()
+                    end 
                                 task.wait(1)
                                 local zeroRoot = character:FindFirstChild("HumanoidRootPart")
 if zeroRoot then
@@ -4622,7 +4626,7 @@ end
                             end
 
                             -- Both conditions met: food rising AND not in a ragdolled state
-                            if curHum and foodRose and not RAGDOLL_STATES[curHum:GetState()] then
+                            if curHum and foodRose and not RAGDOLL_STATES[curHum:GetState()] and (curFood > startFood + 2) then
                                 local relRoot = curChar:FindFirstChild("HumanoidRootPart")
                                 if relRoot then
                                     Animal.CancelTween(true)
@@ -6085,11 +6089,15 @@ hum:ChangeState(Enum.HumanoidStateType.GettingUp)
                 root.Anchored = false
                 hum:ChangeState(Enum.HumanoidStateType.Physics)
                 for _ = 1, 25 do
-                    if character and character:FindFirstChild("HumanoidRootPart") then
-                        character:SetPrimaryPartCFrame(CFrame.new(targetPos))
-                    end
-                    task.wait()
-                end
+    local r = character:FindFirstChild("HumanoidRootPart")
+    if r then
+        r.Anchored = true
+        r.AssemblyLinearVelocity = Vector3.zero
+        r.AssemblyAngularVelocity = Vector3.zero
+        character:SetPrimaryPartCFrame(CFrame.new(targetPos))
+    end
+    task.wait()
+end
                 task.wait(1)
                 hum:ChangeState(Enum.HumanoidStateType.GettingUp)
                 for _ = 1, 10 do
