@@ -4752,7 +4752,7 @@ do
 
                     -- Savannah can wait longer; Jungle keeps the safer early drink trigger.
                     local water = character:GetAttribute('Water') or 0
-                    local drinkTrigger = shared._growthGameName == "SavannahLife" and 55 or 90
+                    local drinkTrigger = 85
                     if water <= drinkTrigger then
                         character:SetAttribute('_drinkingToFull', true)
                     end
@@ -6859,7 +6859,7 @@ task.spawn(function()
     -- auto eat carcass). Cycles AUTO EAT CARCASS + AUTO DRINK only, never auto eat.
     -- ============================================================
     task.spawn(function()
-        local LOW_THRESHOLD  = 40   -- % that triggers the kick
+        local LOW_THRESHOLD  = 55   -- % that triggers the kick
         local RECHECK_WAIT   = 15   -- seconds to wait before re-checking
         local inCycle        = false -- prevent overlapping cycles
 
