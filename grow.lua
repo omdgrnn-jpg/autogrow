@@ -4429,11 +4429,18 @@ do
                                     task.wait()
                                 end
                                 task.wait(1)
-                                hum:ChangeState(Enum.HumanoidStateType.GettingUp)
-                                for _ = 1, 10 do
-                                    character:SetAttribute("MovementDisabled", false)
-                                    task.wait(0.1)
-                                end
+                                local zeroRoot = character:FindFirstChild("HumanoidRootPart")
+if zeroRoot then
+    zeroRoot.AssemblyLinearVelocity = Vector3.zero
+    zeroRoot.AssemblyAngularVelocity = Vector3.zero
+end
+hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+for _ = 1, 10 do
+    character:SetAttribute("MovementDisabled", false)
+    task.wait(0.1)
+end
+
+-- Verify position
                                 -- Verify position
                                 local r = character:FindFirstChild("HumanoidRootPart")
                                 if r then
@@ -6045,8 +6052,12 @@ task.spawn(function()
         task.wait(0.5)
         -- Unanchor AFTER position is confirmed
         local finalRoot = character:FindFirstChild("HumanoidRootPart")
-        if finalRoot then finalRoot.Anchored = false end
-        hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+        if finalRoot then
+        finalRoot.AssemblyLinearVelocity = Vector3.zero
+        finalRoot.AssemblyAngularVelocity = Vector3.zero
+        finalRoot.Anchored = false
+    end
+hum:ChangeState(Enum.HumanoidStateType.GettingUp)
         for _ = 1, 10 do
             character:SetAttribute("MovementDisabled", false)
             task.wait(0.1)
@@ -6160,6 +6171,11 @@ task.spawn(function()
         -- Wait 7s for character to fully settle
         print("[GrowthLoop] Waiting 7s for character to settle...")
         task.wait(7)
+        local settleRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+        if settleRoot then
+        settleRoot.AssemblyLinearVelocity = Vector3.zero
+        settleRoot.AssemblyAngularVelocity = Vector3.zero
+    end
 
         -- OFF -> ON -> OFF -> ON  (double-cycle clears any stuck state)
         -- For carnivores: toggle auto eat CARCASS instead of auto eat grass
