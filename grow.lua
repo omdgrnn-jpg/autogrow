@@ -2736,6 +2736,18 @@ do
                 onCheckedChanged(isChecked())
             end)
 
+            local TweenService = game:GetService("TweenService")
+            local GlowFrame = create'Frame'{
+                Name = 'Glow',
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+                BackgroundTransparency = 1,
+                BorderSizePixel = 0,
+                Position = UDim2.fromScale(0.5, 0.5),
+                Size = UDim2.fromOffset(44, 24),
+                ZIndex = 0,
+                create'UICorner'{ CornerRadius = UDim.new(1, 0) },
+            }
             local checkboxFrame = create'Frame'{
                 Name = 'Checkbox',
                 BackgroundTransparency = 1,
@@ -2747,14 +2759,22 @@ do
                     VerticalAlignment = Enum.VerticalAlignment.Center,
                 },
                 Label({ content = props.label }),
-                create'ImageButton'{
+                local GlowFrame = create'Frame'{
+                    Name = 'Glow',
+                    AnchorPoint = Vector2.new(0.5, 0.5),
+                    BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+                    BackgroundTransparency = 1,
+                    BorderSizePixel = 0,
+                    Position = UDim2.fromScale(0.5, 0.5),
+                    Size = UDim2.fromOffset(44, 24),
+                    ZIndex = 0,
+                    create'UICorner'{ CornerRadius = UDim.new(1, 0) },
+                }
+                local CheckButton = create'ImageButton'{
                     Name = 'CheckButton',
                     BackgroundColor3 = Color3.fromRGB(30, 30, 30),
                     BackgroundTransparency = 0,
                     Size = UDim2.fromOffset(36, 16),
-                    Activated = function()
-                        if not isDisabled() then isChecked(not isChecked()) end
-                    end,
                     create'UICorner'{ CornerRadius = UDim.new(1, 0) },
                     create'Frame'{
                         Name = 'Knob',
@@ -2765,9 +2785,28 @@ do
                         BorderSizePixel = 0,
                         create'UICorner'{ CornerRadius = UDim.new(1, 0) },
                     },
+                    GlowFrame,
                     create'UIFlexItem'{},
+                    Activated = function()
+                        if isDisabled() then return end
+                        isChecked(not isChecked())
+                        GlowFrame.BackgroundTransparency = 0.55
+                        TweenService:Create(GlowFrame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+                            BackgroundTransparency = 1,
+                        }):Play()
+                    end,
+                    MouseEnter = function()
+                        if isDisabled() then return end
+                        TweenService:Create(GlowFrame, TweenInfo.new(0.15), {
+                            BackgroundTransparency = 0.82,
+                        }):Play()
+                    end,
+                    MouseLeave = function()
+                        TweenService:Create(GlowFrame, TweenInfo.new(0.2), {
+                            BackgroundTransparency = 1,
+                        }):Play()
+                    end,
                 },
-            }
 
             effect(function()
                 local transparency = isDisabled() and 0.5 or 0
@@ -2956,9 +2995,6 @@ local function getWaterVerticalGoal(rootPosition)
     local wp = FindNearestWaterShore(rootPosition, waterStartingRadius)
     if wp then return CFrame.new(rootPosition.X, wp.Y + 2, rootPosition.Z) end
 end
-        -- ============================================================
-        -- CARCASS HELPERS
-        -- ============================================================
         local CARNIVORES = {
             Lion=true, Tiger=true, Cheetah=true,
             Crocodile=true, Leopard=true, ["T-Rex"]=true, TRex=true,
@@ -3220,9 +3256,6 @@ local function carcassWhileChecked()
             carcassEatBusy       = false
         end
 
-        -- ============================================================
-        -- CHECKBOXES
-        -- ============================================================
         return {
             Checkbox({
                 label = 'Auto eat',
@@ -3330,7 +3363,6 @@ local function carcassWhileChecked()
 if waterGoal then
     local humanoid = character:FindFirstChild("Humanoid")
     local hipHeight = humanoid and humanoid.HipHeight or 3
-    -- lift goal above water surface so character doesn't clip in
     local liftedGoal = CFrame.new(
         waterGoal.Position.X,
         waterGoal.Position.Y + hipHeight + 1.5,
@@ -3499,7 +3531,6 @@ destroy = root(function()
     end)
 end)
 
--- Anti-AFK layer 1
 task.spawn(function()
     local VirtualUser = game:GetService("VirtualUser")
     game:GetService("Players").LocalPlayer.Idled:Connect(function()
@@ -3509,7 +3540,6 @@ task.spawn(function()
     end)
 end)
 
--- Anti-AFK layer 2
 task.spawn(function()
     local VirtualUser = game:GetService("VirtualUser")
     local camera = workspace.CurrentCamera
@@ -3534,7 +3564,6 @@ task.spawn(function()
     end
 end)
 
--- Inf Stamina
 task.spawn(function()
     local Players    = game:GetService("Players")
     local RunService = game:GetService("RunService")
@@ -3546,7 +3575,6 @@ task.spawn(function()
     end)
 end)
 
--- Always Daytime
 task.spawn(function()
     local RunService = game:GetService("RunService")
     local Lighting   = game:GetService("Lighting")
@@ -3555,7 +3583,6 @@ task.spawn(function()
     end)
 end)
 
--- Auto Growth Loop
 task.spawn(function()
     local Players       = game:GetService("Players")
     local RS            = game:GetService("ReplicatedStorage")
@@ -4611,7 +4638,6 @@ local hudGui = Instance.new("ScreenGui")
         end
     end)
 
-    -- Menu-stuck watchdog
     task.spawn(function()
         local stuckTimer        = 0
         local STUCK_THRESHOLD   = 90
@@ -4683,7 +4709,6 @@ local hudGui = Instance.new("ScreenGui")
         end
     end)
 
-    -- Eat/drink reliability watchdog (Lion/Tiger only)
     task.spawn(function()
         local LOW_THRESHOLD = 40
         local RECHECK_WAIT  = 15
@@ -4736,7 +4761,6 @@ local hudGui = Instance.new("ScreenGui")
     print("[GrowthLoop] Auto growth loop started.")
 end)
 
--- Safety net
 task.spawn(function()
     local Players    = game:GetService("Players")
     local RunService = game:GetService("RunService")
