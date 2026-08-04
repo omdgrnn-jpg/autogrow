@@ -1842,7 +1842,7 @@ do
             local mode = props.mode
             return create'Frame'{
                 Name = 'Separator',
-                BackgroundColor3 = Color3.fromHSV(0, 0, 0.15),
+                BackgroundColor3 = Color3.fromRGB(45, 45, 45),
                 BorderColor3 = Color3.new(),
                 BorderSizePixel = 0,
                 LayoutOrder = 0,
@@ -2017,18 +2017,16 @@ do
 
             DragPreviewFrame = create'Frame'{
                 Name = 'Frame1',
-                BackgroundColor3 = Color3.fromHSV(0, 0, 0.1),
-                BackgroundTransparency = 0.65,
+                BackgroundColor3 = Color3.fromRGB(15, 15, 15),
+                BackgroundTransparency = 0.5,
                 ClipsDescendants = true,
                 Position = UDim2.fromOffset(20, 20),
                 Size = size,
                 Visible = true,
                 ZIndex = -1,
-                create'UICorner'{ CornerRadius = UDim.new(0, 8) },
-            }
-            Window = create'Frame'{
+                create'UICorner'{ Name = 'UICorner', CornerRadius = UDim.new(0, 6) },
                 Name = 'Frame1',
-                BackgroundColor3 = Color3.fromHSV(0, 0, 0.1),
+                BackgroundColor3 = Color3.fromRGB(18, 18, 18),
                 ClipsDescendants = false,
                 Position = UDim2.fromOffset(20, 20),
                 Size = size,
@@ -2041,7 +2039,13 @@ do
                         end
                     end
                 end,
-                create'UICorner'{ CornerRadius = UDim.new(0, 8) },
+                create'UIGradient'{
+                    Color = ColorSequence.new{
+                        ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 28, 28)),
+                        ColorSequenceKeypoint.new(1, Color3.fromRGB(8, 8, 8)),
+                    },
+                    Rotation = 135,
+                },
                 ResizeHandle({
                     handleMode = 'corner',
                     resizeMode = source(),
@@ -2062,8 +2066,9 @@ do
                     },
                     create'Frame'{
                         Name = 'Sidebar',
-                        BackgroundTransparency = 1,
-                        Size = UDim2.new(0, showSidebar and 30 or 0, 1, 0),
+                        BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+                        BackgroundTransparency = 0,
+                        Size = UDim2.new(0, showSidebar and 34 or 0, 1, 0),
                         Visible = showSidebar,
                         create'UIPadding'{
                             PaddingBottom = UDim.new(0, 4),
@@ -2269,7 +2274,7 @@ do
                 AutomaticSize = Enum.AutomaticSize.X,
                 Size = UDim2.new(0, 0, 0, 20),
                 Text = props.content,
-                TextColor3 = props.color or Color3.fromRGB(161, 161, 161),
+                TextColor3 = props.color or Color3.fromRGB(195, 195, 195),
                 TextSize = props.size or 10,
                 TextXAlignment = Enum.TextXAlignment.Left,
                 LayoutOrder = props.layoutOrder or 0,
@@ -2332,12 +2337,6 @@ do
                             FillDirection = Enum.FillDirection.Horizontal,
                             Wraps = true,
                         },
-                        (i > 1 and { Separator({ mode = source('horizontal') }) } or {nil})[1],
-                        Label({
-                            content = section().name,
-                            color = Color3.fromHSV(0, 0, 0.8),
-                            size = 10,
-                        }),
                         unpack(section().content),
                     }
                     return {sectionFrame}
@@ -2548,7 +2547,7 @@ do
         local check = __DARKLUA_BUNDLE_MODULES.load('y')
         local vide = __DARKLUA_BUNDLE_MODULES.load('x')
         local create = vide.create
-        local barBackground = Color3.fromHSV(0, 0, 0.4)
+        local barBackground = Color3.fromRGB(55, 55, 55)
 
         local function CreateTrailBar(isFinalizer, size)
             return create'Frame'{
@@ -2750,22 +2749,22 @@ do
                 Label({ content = props.label }),
                 create'ImageButton'{
                     Name = 'CheckButton',
-                    BackgroundColor3 = Color3.fromHSV(0, 0, 1),
+                    BackgroundColor3 = Color3.fromRGB(30, 30, 30),
                     BackgroundTransparency = 0,
-                    Size = UDim2.fromOffset(18, 18),
+                    Size = UDim2.fromOffset(36, 16),
                     Activated = function()
                         if not isDisabled() then isChecked(not isChecked()) end
                     end,
-                    create'UICorner'{ CornerRadius = UDim.new(0, 6) },
-                    Icon({
-                        icon = {
-                            image = 'rbxassetid://84900867946882',
-                            size = Vector2.zero,
-                            position = Vector2.zero,
-                        },
-                        color = Color3.new(0, 0, 0),
-                        size = 10,
-                    }),
+                    create'UICorner'{ CornerRadius = UDim.new(1, 0) },
+                    create'Frame'{
+                        Name = 'Knob',
+                        AnchorPoint = Vector2.new(0, 0.5),
+                        Position = UDim2.new(0, 2, 0.5, 0),
+                        Size = UDim2.fromOffset(12, 12),
+                        BackgroundColor3 = Color3.fromRGB(90, 90, 90),
+                        BorderSizePixel = 0,
+                        create'UICorner'{ CornerRadius = UDim.new(1, 0) },
+                    },
                     create'UIFlexItem'{},
                 },
             }
@@ -2773,14 +2772,20 @@ do
             effect(function()
                 local transparency = isDisabled() and 0.5 or 0
                 checkboxFrame.CheckButton.Active = not isDisabled()
-                checkboxFrame.CheckButton.Transparency = transparency
+                checkboxFrame.CheckButton.BackgroundTransparency = transparency
                 checkboxFrame.Label.TextTransparency = transparency
             end)
             effect(function()
-                local isCheckedValue = isChecked()
-                local color = isCheckedValue and Color3.new(1, 1, 1) or Color3.fromRGB(40, 40, 40)
-                checkboxFrame.CheckButton.BackgroundColor3 = color
-                checkboxFrame.CheckButton.Icon.Visible = isCheckedValue
+                local on = isChecked()
+                checkboxFrame.CheckButton.BackgroundColor3 = on
+                    and Color3.fromRGB(200, 200, 200)
+                    or Color3.fromRGB(30, 30, 30)
+                checkboxFrame.CheckButton.Knob.BackgroundColor3 = on
+                    and Color3.fromRGB(20, 20, 20)
+                    or Color3.fromRGB(90, 90, 90)
+                checkboxFrame.CheckButton.Knob.Position = on
+                    and UDim2.new(1, -14, 0.5, 0)
+                    or UDim2.new(0, 2, 0.5, 0)
             end)
 
             if not childs then return checkboxFrame end
@@ -3052,18 +3057,6 @@ end
         end
 
 local function carcassWhileChecked()
-    if carcassEatBusy then return end
-    if (tick() - lastEatEndTime) < EAT_COOLDOWN then return end
-    if shared._inGrowthReset then return end
-
-    local character = player.Character
-    if not character then return end
-
-    -- yield to drink if water is low
-    local curWater = character:GetAttribute("Water") or 100
-    if curWater <= 50 then return false end  -- raise threshold from 30 to 50
-
-        local function carcassWhileChecked()
             if carcassEatBusy then return end
             if (tick() - lastEatEndTime) < EAT_COOLDOWN then return end
             if shared._inGrowthReset then return end
@@ -3268,15 +3261,16 @@ local function carcassWhileChecked()
             }),
 
             Checkbox({
-                label = 'Auto drink',
-                isChecked = autoDrinkChecked,
-                controlPriority = {character = 3},  -- was 2, now higher than carcass
-                WhileChecked = function()
+                label = 'Auto eat carcass',
+                isChecked = autoEatCarcassChecked,
+                controlPriority = {character = 2},
+                WhileChecked = carcassWhileChecked,
+            }),
 
             Checkbox({
                 label = 'Auto drink',
                 isChecked = autoDrinkChecked,
-                controlPriority = {character = 2},
+                controlPriority = {character = 3},
                 WhileChecked = function()
                     local character = player.Character
                     if not character then return end
@@ -3490,6 +3484,19 @@ destroy = root(function()
         destroy()
         app:Destroy()
     end
+    task.defer(function()
+        local win = app:FindFirstChild("Frame1", true)
+        if win and win:IsA("Frame") then
+            win.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+            local g = Instance.new("UIGradient")
+            g.Color = ColorSequence.new{
+                ColorSequenceKeypoint.new(0, Color3.fromRGB(40, 40, 40)),
+                ColorSequenceKeypoint.new(1, Color3.fromRGB(6, 6, 6)),
+            }
+            g.Rotation = 130
+            g.Parent = win
+        end
+    end)
 end)
 
 -- Anti-AFK layer 1
@@ -4442,37 +4449,70 @@ task.spawn(function()
         task.spawn(trackCurrentCharacter)
     end)
 
-    -- HUD
-    local hudGui = Instance.new("ScreenGui")
+local hudGui = Instance.new("ScreenGui")
     hudGui.Name = "GrowthLoopHUD"
     hudGui.ResetOnSpawn = false
     hudGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
     hudGui.Parent = game:GetService("CoreGui")
 
-    local CARD_W, CARD_H = 190, 68
+    local CARD_W, CARD_H = 200, 90
+
     local hudFrame = Instance.new("Frame")
     hudFrame.Size = UDim2.new(0, CARD_W, 0, CARD_H)
-    hudFrame.Position = UDim2.new(1, -(CARD_W + 8), 0, 8)
-    hudFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 16)
-    hudFrame.BackgroundTransparency = 0.15
+    hudFrame.Position = UDim2.new(1, -(CARD_W + 10), 0, 10)
+    hudFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+    hudFrame.BackgroundTransparency = 0.08
     hudFrame.BorderSizePixel = 0
     hudFrame.Parent = hudGui
-    Instance.new("UICorner", hudFrame).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner", hudFrame).CornerRadius = UDim.new(0, 6)
 
-    local accent = Instance.new("Frame")
-    accent.Size = UDim2.new(0, 3, 1, -14)
-    accent.Position = UDim2.new(0, 0, 0, 7)
-    accent.BackgroundColor3 = Color3.fromRGB(80, 200, 120)
-    accent.BorderSizePixel = 0
-    accent.Parent = hudFrame
-    Instance.new("UICorner", accent).CornerRadius = UDim.new(0, 2)
+    local topLine = Instance.new("Frame")
+    topLine.Size = UDim2.new(1, 0, 0, 1)
+    topLine.Position = UDim2.new(0, 0, 0, 0)
+    topLine.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    topLine.BorderSizePixel = 0
+    topLine.Parent = hudFrame
 
-    local function lbl(y, sz, bold)
+    local header = Instance.new("Frame")
+    header.Size = UDim2.new(1, 0, 0, 22)
+    header.Position = UDim2.new(0, 0, 0, 0)
+    header.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+    header.BorderSizePixel = 0
+    header.Parent = hudFrame
+    Instance.new("UICorner", header).CornerRadius = UDim.new(0, 6)
+
+    local headerFix = Instance.new("Frame")
+    headerFix.Size = UDim2.new(1, 0, 0, 6)
+    headerFix.Position = UDim2.new(0, 0, 1, -6)
+    headerFix.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+    headerFix.BorderSizePixel = 0
+    headerFix.Parent = header
+
+    local headerLabel = Instance.new("TextLabel")
+    headerLabel.Size = UDim2.new(1, -10, 1, 0)
+    headerLabel.Position = UDim2.new(0, 10, 0, 0)
+    headerLabel.BackgroundTransparency = 1
+    headerLabel.Text = "growthloop"
+    headerLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+    headerLabel.TextSize = 10
+    headerLabel.Font = Enum.Font.GothamMedium
+    headerLabel.TextXAlignment = Enum.TextXAlignment.Left
+    headerLabel.Parent = header
+
+    local statusDot = Instance.new("Frame")
+    statusDot.Size = UDim2.new(0, 6, 0, 6)
+    statusDot.Position = UDim2.new(1, -14, 0.5, -3)
+    statusDot.BackgroundColor3 = Color3.fromRGB(80, 210, 100)
+    statusDot.BorderSizePixel = 0
+    statusDot.Parent = header
+    Instance.new("UICorner", statusDot).CornerRadius = UDim.new(1, 0)
+
+    local function lbl(y, sz, color, bold)
         local l = Instance.new("TextLabel")
-        l.Size = UDim2.new(1, -16, 0, sz + 2)
-        l.Position = UDim2.new(0, 12, 0, y)
+        l.Size = UDim2.new(1, -20, 0, sz + 3)
+        l.Position = UDim2.new(0, 10, 0, y)
         l.BackgroundTransparency = 1
-        l.TextColor3 = Color3.fromRGB(230, 230, 230)
+        l.TextColor3 = color or Color3.fromRGB(210, 210, 210)
         l.TextSize = sz
         l.Font = bold and Enum.Font.GothamBold or Enum.Font.Gotham
         l.TextXAlignment = Enum.TextXAlignment.Left
@@ -4481,14 +4521,13 @@ task.spawn(function()
         return l
     end
 
-    local lblSlot   = lbl(6,  12, true)
-    local lblGrowth = lbl(22, 11, false)
-    local lblMode   = lbl(51, 9,  false)
+    local lblSlot   = lbl(26, 11, Color3.fromRGB(230, 230, 230), true)
+    local lblGrowth = lbl(40, 10, Color3.fromRGB(160, 160, 160), false)
 
     local barBg = Instance.new("Frame")
-    barBg.Size = UDim2.new(1, -26, 0, 5)
-    barBg.Position = UDim2.new(0, 12, 0, 36)
-    barBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    barBg.Size = UDim2.new(1, -20, 0, 3)
+    barBg.Position = UDim2.new(0, 10, 0, 56)
+    barBg.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     barBg.BorderSizePixel = 0
     barBg.Parent = hudFrame
     Instance.new("UICorner", barBg).CornerRadius = UDim.new(1, 0)
@@ -4500,49 +4539,75 @@ task.spawn(function()
     barFill.Parent = barBg
     Instance.new("UICorner", barFill).CornerRadius = UDim.new(1, 0)
 
+    local lblMode = lbl(62, 9, Color3.fromRGB(100, 100, 100), false)
+
+    local midLine = Instance.new("Frame")
+    midLine.Size = UDim2.new(1, -20, 0, 1)
+    midLine.Position = UDim2.new(0, 10, 0, 76)
+    midLine.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    midLine.BorderSizePixel = 0
+    midLine.Parent = hudFrame
+
+    local footer = Instance.new("TextLabel")
+    footer.Size = UDim2.new(1, -20, 0, 12)
+    footer.Position = UDim2.new(0, 10, 0, 78)
+    footer.BackgroundTransparency = 1
+    footer.Text = "made by citywraith"
+    footer.TextColor3 = Color3.fromRGB(65, 65, 65)
+    footer.TextSize = 9
+    footer.Font = Enum.Font.Gotham
+    footer.TextXAlignment = Enum.TextXAlignment.Left
+    footer.Parent = hudFrame
+
     task.spawn(function()
         while true do
             task.wait(0.5)
             local ch = player.Character
             local growth = ch and ch:GetAttribute("GrowthPercentage") or 0
-            local slotName = currentGrowthName or "—"
-            local growthPct = math.floor(growth * 100)
+            local slotName = currentGrowthName or "none"
             local trackedTotal = getTrackedSlotTotal()
             local slotIdx = findSlotIndexByName(currentGrowthName) or 0
             if trackedTotal > 0 then slotIdx = math.clamp(slotIdx, 0, trackedTotal) else slotIdx = 0 end
-            lblSlot.Text = string.format("%s  [%d/%d]", slotName, slotIdx, trackedTotal)
-            lblGrowth.Text = string.format("Growth: %d%%", growthPct)
+
+            lblSlot.Text = string.format("%s  [%d / %d]", slotName, slotIdx, trackedTotal)
+            lblGrowth.Text = string.format("growth  %d%%", math.floor(growth * 100))
+
             local pct = math.clamp(growth, 0, 1)
+            local fillColor
             if pct < 0.5 then
-                lblGrowth.TextColor3 = Color3.fromRGB(255, math.floor(pct * 2 * 200), 60)
+                fillColor = Color3.fromRGB(255, math.floor(pct * 2 * 180 + 60), 60)
             else
-                lblGrowth.TextColor3 = Color3.fromRGB(math.floor((1-pct)*2*255), 210, 60)
+                fillColor = Color3.fromRGB(math.floor((1 - pct) * 2 * 200 + 55), 210, 60)
             end
-            barFill.Size = UDim2.new(math.clamp(pct, 0, 1), 0, 1, 0)
+            barFill.Size = UDim2.new(pct, 0, 1, 0)
+            barFill.BackgroundColor3 = fillColor
+            statusDot.BackgroundColor3 = fillColor
+
             local mode, col
             if parkingMode then
-                mode = "* passive coins"
-                col = Color3.fromRGB(255, 200, 50)
+                mode = "passive coins"
+                col = Color3.fromRGB(220, 180, 60)
             elseif growExistingSlots and growNewSlots then
-                col = Color3.fromRGB(100, 180, 255)
+                col = Color3.fromRGB(90, 160, 255)
                 if allExistingGrown then
-                    mode = "* smart > new slots"
+                    mode = "smart  >  new slots"
                 else
-                    mode = string.format("* smart > existing %d/%d", slotsGrownThisCycle, originalSlotCount)
+                    mode = string.format("smart  >  existing  %d / %d", slotsGrownThisCycle, originalSlotCount)
                 end
             elseif growExistingSlots then
-                mode = "* growing existing"
+                mode = "growing existing"
                 col = Color3.fromRGB(80, 200, 120)
             elseif growNewSlots then
-                mode = "* growing new"
-                col = Color3.fromRGB(255, 150, 80)
+                mode = "growing new"
+                col = Color3.fromRGB(255, 140, 70)
             else
-                mode = "* idle"
-                col = Color3.fromRGB(100, 100, 100)
+                mode = "idle"
+                col = Color3.fromRGB(80, 80, 80)
             end
+
             lblMode.Text = mode
             lblMode.TextColor3 = col
-            accent.BackgroundColor3 = col
+            topLine.BackgroundColor3 = col
         end
     end)
 
