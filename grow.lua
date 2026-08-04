@@ -3324,14 +3324,22 @@ do
                         if root.Anchored then root.Anchored = false end
                         if humanoid then humanoid:ChangeState(Enum.HumanoidStateType.GettingUp) end
                         local waterGoal = getWaterVerticalGoal(root.Position)
-                        if waterGoal then
-                            local dist = (waterGoal.Position - root.Position).Magnitude
-                            if dist > 1 and tick() - lastDrinkMoveAt >= DRINK_MOVE_COOLDOWN then
-                                lastDrinkMoveAt = tick()
-                                Animal.TweenToAsync(waterGoal)
-                            else
-                                task.wait(0.25)
-                            end
+if waterGoal then
+    local humanoid = character:FindFirstChild("Humanoid")
+    local hipHeight = humanoid and humanoid.HipHeight or 3
+    -- lift goal above water surface so character doesn't clip in
+    local liftedGoal = CFrame.new(
+        waterGoal.Position.X,
+        waterGoal.Position.Y + hipHeight + 1.5,
+        waterGoal.Position.Z
+    )
+    local dist = (liftedGoal.Position - root.Position).Magnitude
+    if dist > 1 and tick() - lastDrinkMoveAt >= DRINK_MOVE_COOLDOWN then
+        lastDrinkMoveAt = tick()
+        Animal.TweenToAsync(liftedGoal)
+    else
+        task.wait(0.25)
+    end
                         else
                             return false
                         end
