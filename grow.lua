@@ -2736,18 +2736,6 @@ do
                 onCheckedChanged(isChecked())
             end)
 
-            local TweenService = game:GetService("TweenService")
-            local GlowFrame = create'Frame'{
-                Name = 'Glow',
-                AnchorPoint = Vector2.new(0.5, 0.5),
-                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Position = UDim2.fromScale(0.5, 0.5),
-                Size = UDim2.fromOffset(44, 24),
-                ZIndex = 0,
-                create'UICorner'{ CornerRadius = UDim.new(1, 0) },
-            }
             local checkboxFrame = create'Frame'{
                 Name = 'Checkbox',
                 BackgroundTransparency = 1,
@@ -2759,25 +2747,14 @@ do
                     VerticalAlignment = Enum.VerticalAlignment.Center,
                 },
                 Label({ content = props.label }),
-                CheckButton,
-            }
-
-            local GlowFrame = create'Frame'{
-                Name = 'Glow',
-                AnchorPoint = Vector2.new(0.5, 0.5),
-                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-                BackgroundTransparency = 1,
-                BorderSizePixel = 0,
-                Position = UDim2.fromScale(0.5, 0.5),
-                Size = UDim2.fromOffset(44, 24),
-                ZIndex = 0,
-                create'UICorner'{ CornerRadius = UDim.new(1, 0) },
-            }
-            local CheckButton = create'ImageButton'{
+                create'ImageButton'{
                     Name = 'CheckButton',
                     BackgroundColor3 = Color3.fromRGB(30, 30, 30),
                     BackgroundTransparency = 0,
                     Size = UDim2.fromOffset(36, 16),
+                    Activated = function()
+                        if not isDisabled() then isChecked(not isChecked()) end
+                    end,
                     create'UICorner'{ CornerRadius = UDim.new(1, 0) },
                     create'Frame'{
                         Name = 'Knob',
@@ -2788,28 +2765,9 @@ do
                         BorderSizePixel = 0,
                         create'UICorner'{ CornerRadius = UDim.new(1, 0) },
                     },
-                    GlowFrame,
                     create'UIFlexItem'{},
-                    Activated = function()
-                        if isDisabled() then return end
-                        isChecked(not isChecked())
-                        GlowFrame.BackgroundTransparency = 0.55
-                        TweenService:Create(GlowFrame, TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-                            BackgroundTransparency = 1,
-                        }):Play()
-                    end,
-                    MouseEnter = function()
-                        if isDisabled() then return end
-                        TweenService:Create(GlowFrame, TweenInfo.new(0.15), {
-                            BackgroundTransparency = 0.82,
-                        }):Play()
-                    end,
-                    MouseLeave = function()
-                        TweenService:Create(GlowFrame, TweenInfo.new(0.2), {
-                            BackgroundTransparency = 1,
-                        }):Play()
-                    end,
                 },
+            }
 
             effect(function()
                 local transparency = isDisabled() and 0.5 or 0
@@ -4763,6 +4721,7 @@ local hudGui = Instance.new("ScreenGui")
 
     print("[GrowthLoop] Auto growth loop started.")
 end)
+
 
 task.spawn(function()
     local Players    = game:GetService("Players")
