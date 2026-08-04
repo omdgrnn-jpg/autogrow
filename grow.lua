@@ -1967,8 +1967,12 @@ do
             local positionX = startPos.X.Offset + deltaX
             local positionY = startPos.Y.Offset + deltaY
             local position = ClampPositionToScreen(UDim2.fromOffset(positionX, positionY), frame.AbsoluteSize)
-            local distance = (Vector2.new(position.X, position.Y) - Vector2.new(positionX, positionY)).Magnitude
-            frame:TweenPosition(position, nil, Enum.EasingStyle.Back, (distance / distance) / 3, true)
+            local clampedX = position.X.Offset
+            local clampedY = position.Y.Offset
+            local deltaVector = Vector2.new(clampedX - startPos.X.Offset, clampedY - startPos.Y.Offset)
+            local distance = deltaVector.Magnitude
+            local duration = distance > 0 and math.clamp(distance / 400, 0.05, 0.2) or 0
+            frame:TweenPosition(position, nil, Enum.EasingStyle.Quad, duration, true)
             TweenService:Create(dragPreviewFrame, dragPreviewFrameFadeStyle, {Transparency = 0.9}):Play()
             dragPreviewFrame.Position = position
         end
@@ -3466,7 +3470,59 @@ function App()
     }
 end
 
+local Players = game:GetService('Players')
+local HttpService = game:GetService('HttpService')
+
+local DISCORD_AUTH_ENDPOINT = 'https://your-discord-bot.example.com/authorize'
+local REQUIRED_ROLE_ID = '1522202846357880975'
+
+local function IsAuthorizedForScript()
+    local player = Players.LocalPlayer
+
+    if not player then
+        return false
+    end
+
+    local ok, response = pcall(function()
+        return HttpService:RequestAsync({
+            Url = DISCORD_AUTH_ENDPOINT,
+            Method = 'POST',
+            Headers = {
+                ['Content-Type'] = 'application/json',
+            },
+            Body = HttpService:JSONEncode({
+                userId = tostring(player.UserId),
+                username = tostring(player.Name),
+                roleId = REQUIRED_ROLE_ID,
+            }),
+        })
+    end)
+
+    if not ok or not response or not response.Success then
+        return false
+    end
+
+    local decoded
+    local decodeOk, decodedData = pcall(function()
+        return HttpService:JSONDecode(response.Body)
+    end)
+
+    if not decodeOk then
+        return false
+    end
+
+    decoded = decodedData
+    return decoded and decoded.allowed == true
+end
+
 if not game:IsLoaded() then game.Loaded:Wait() end
+
+if not IsAuthorizedForScript() then
+    if Players.LocalPlayer then
+        Players.LocalPlayer:Kick('you dont have access stfu')
+    end
+    return
+end
 
 local destroy
 destroy = root(function()
