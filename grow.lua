@@ -2759,18 +2759,21 @@ do
                     VerticalAlignment = Enum.VerticalAlignment.Center,
                 },
                 Label({ content = props.label }),
-                local GlowFrame = create'Frame'{
-                    Name = 'Glow',
-                    AnchorPoint = Vector2.new(0.5, 0.5),
-                    BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-                    BackgroundTransparency = 1,
-                    BorderSizePixel = 0,
-                    Position = UDim2.fromScale(0.5, 0.5),
-                    Size = UDim2.fromOffset(44, 24),
-                    ZIndex = 0,
-                    create'UICorner'{ CornerRadius = UDim.new(1, 0) },
-                }
-                local CheckButton = create'ImageButton'{
+                CheckButton,
+            }
+
+            local GlowFrame = create'Frame'{
+                Name = 'Glow',
+                AnchorPoint = Vector2.new(0.5, 0.5),
+                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+                BackgroundTransparency = 1,
+                BorderSizePixel = 0,
+                Position = UDim2.fromScale(0.5, 0.5),
+                Size = UDim2.fromOffset(44, 24),
+                ZIndex = 0,
+                create'UICorner'{ CornerRadius = UDim.new(1, 0) },
+            }
+            local CheckButton = create'ImageButton'{
                     Name = 'CheckButton',
                     BackgroundColor3 = Color3.fromRGB(30, 30, 30),
                     BackgroundTransparency = 0,
