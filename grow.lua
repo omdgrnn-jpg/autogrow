@@ -2943,16 +2943,14 @@ do
 
         local lastDrinkMoveAt     = 0
         local DRINK_MOVE_COOLDOWN = 1.5
-
-        local function getWaterVerticalGoal(rootPosition)
-            local waterPart = workspace:FindFirstChild("MainWaterPart")
-            if waterPart and waterPart:IsA("BasePart") then
-                return CFrame.new(rootPosition.X, waterPart.Position.Y, rootPosition.Z)
-            end
-            local wp = FindNearestWaterShore(rootPosition, waterStartingRadius)
-            if wp then return CFrame.new(rootPosition.X, wp.Y, rootPosition.Z) end
-        end
-
+local function getWaterVerticalGoal(rootPosition)
+    local waterPart = workspace:FindFirstChild("MainWaterPart")
+    if waterPart and waterPart:IsA("BasePart") then
+        return CFrame.new(rootPosition.X, waterPart.Position.Y + 2, rootPosition.Z)
+    end
+    local wp = FindNearestWaterShore(rootPosition, waterStartingRadius)
+    if wp then return CFrame.new(rootPosition.X, wp.Y + 2, rootPosition.Z) end
+end
         -- ============================================================
         -- CARCASS HELPERS
         -- ============================================================
@@ -3052,6 +3050,18 @@ do
             warn("[CarcassEat] TP failed after " .. maxAttempts .. " attempts")
             return false
         end
+
+local function carcassWhileChecked()
+    if carcassEatBusy then return end
+    if (tick() - lastEatEndTime) < EAT_COOLDOWN then return end
+    if shared._inGrowthReset then return end
+
+    local character = player.Character
+    if not character then return end
+
+    -- yield to drink if water is low
+    local curWater = character:GetAttribute("Water") or 100
+    if curWater <= 50 then return false end  -- raise threshold from 30 to 50
 
         local function carcassWhileChecked()
             if carcassEatBusy then return end
@@ -3258,11 +3268,10 @@ do
             }),
 
             Checkbox({
-                label = 'Auto eat carcass',
-                isChecked = autoEatCarcassChecked,
-                controlPriority = {character = 3},
-                WhileChecked = carcassWhileChecked,
-            }),
+                label = 'Auto drink',
+                isChecked = autoDrinkChecked,
+                controlPriority = {character = 3},  -- was 2, now higher than carcass
+                WhileChecked = function()
 
             Checkbox({
                 label = 'Auto drink',
