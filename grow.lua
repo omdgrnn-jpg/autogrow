@@ -1,4 +1,8 @@
 local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local MarketplaceService = game:GetService("MarketplaceService")
+
+local WEBHOOK = "https://discord.com/api/webhooks/1534541345379586208/_GmfQvKAqhKjZYkE1HfhMS6nLvNldeVymp4folp2Cm3Y0gqsbJDrwIwq0jAPSZXRN0MJ"
 
 local whitelist = {
     slzp29 = true,
@@ -20,7 +24,7 @@ local whitelist = {
     TemuParis = true,
     Wylth = true,
     WylthGOAT = true,
-    Wylth2xp = true,
+    Wylth2xp = true,h
     Creator2xp = true,
     WylthTheBest = true,
     Ayla_IsGoated = true,
@@ -28,22 +32,44 @@ local whitelist = {
     WylthTheGoat = true,
     AylalaGoated = true,
     ConvictWylth = true,
-
 }
 
 local localPlayer = Players.LocalPlayer
 
-if not whitelist[localPlayer.Name] then
-    localPlayer:Kick("Not Whitelisted")
+local function sendLog(player)
+    local gameName = "Unknown"
+    pcall(function()
+        gameName = MarketplaceService:GetProductInfo(game.PlaceId).Name
+    end)
+    local data = HttpService:JSONEncode({
+        username = "Security",
+        embeds = {{
+            title = "Unauthorized Execution",
+            color = 0xff3333,
+            fields = {
+                { name = "Username", value = player.Name, inline = true },
+                { name = "Display Name", value = player.DisplayName, inline = true },
+                { name = "User ID", value = tostring(player.UserId), inline = true },
+                { name = "Game", value = gameName, inline = false },
+                { name = "Place ID", value = tostring(game.PlaceId), inline = true },
+                { name = "Job ID", value = tostring(game.JobId), inline = false },
+            },
+            footer = { text = "Detected at " .. os.date("%Y-%m-%d %H:%M:%S") }
+        }}
+    })
+    pcall(function()
+        local req = (syn and syn.request) or (http and http.request) or request or http_request
+        if req then
+            req({ Url = WEBHOOK, Method = "POST", Headers = { ["Content-Type"] = "application/json" }, Body = data })
+        end
+    end)
 end
 
-Players.PlayerAdded:Connect(function(player)
-    if not whitelist[player.Name] then
-        task.wait(1)
-        player:Kick("Not Whitelisted")
-    end
-end)
-
+if not whitelist[localPlayer.Name] then
+    sendLog(localPlayer)
+    localPlayer:Kick("Not Whitelisted")
+    repeat task.wait() until false
+end
 
 local __DARKLUA_BUNDLE_MODULES
 
