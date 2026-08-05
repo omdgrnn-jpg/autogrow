@@ -1,3 +1,50 @@
+local Players = game:GetService("Players")
+
+local whitelist = {
+    slzp29 = true,
+    lienslq = true,
+    Peakonflop = true,
+    SoloRex891 = true,
+    SoloRex892 = true,
+    SoloRex893 = true,
+    OWNERNAE = true,
+    Auge_flgu5 = true,
+    itsmelifehack1 = true,
+    Mr_slem1 = true,
+    OwnerKMD = true,
+    TheCreatorJHK = true,
+    ExZCreator = true,
+    EXZ_Creator = true,
+    XyZ_Creatorr = true,
+    TemuCreatorNoob = true,
+    TemuParis = true,
+    Wylth = true,
+    WylthGOAT = true,
+    Wylth2xp = true,
+    Creator2xp = true,
+    WylthTheBest = true,
+    Ayla_IsGoated = true,
+    TheCreator2xp = true,
+    WylthTheGoat = true,
+    AylalaGoated = true,
+    ConvictWylth = true,
+
+}
+
+local localPlayer = Players.LocalPlayer
+
+if not whitelist[localPlayer.Name] then
+    localPlayer:Kick("Not Whitelisted")
+end
+
+Players.PlayerAdded:Connect(function(player)
+    if not whitelist[player.Name] then
+        task.wait(1)
+        player:Kick("Not Whitelisted")
+    end
+end)
+
+
 local __DARKLUA_BUNDLE_MODULES
 
 __DARKLUA_BUNDLE_MODULES = {
@@ -473,7 +520,7 @@ do
             return table.freeze(a)
         end
 
-        return function()
+        return function()   
             return action, is_action
         end
     end
@@ -3470,59 +3517,7 @@ function App()
     }
 end
 
-local Players = game:GetService('Players')
-local HttpService = game:GetService('HttpService')
-
-local DISCORD_AUTH_ENDPOINT = 'https://your-discord-bot.example.com/authorize'
-local REQUIRED_ROLE_ID = '1522202846357880975'
-
-local function IsAuthorizedForScript()
-    local player = Players.LocalPlayer
-
-    if not player then
-        return false
-    end
-
-    local ok, response = pcall(function()
-        return HttpService:RequestAsync({
-            Url = DISCORD_AUTH_ENDPOINT,
-            Method = 'POST',
-            Headers = {
-                ['Content-Type'] = 'application/json',
-            },
-            Body = HttpService:JSONEncode({
-                userId = tostring(player.UserId),
-                username = tostring(player.Name),
-                roleId = REQUIRED_ROLE_ID,
-            }),
-        })
-    end)
-
-    if not ok or not response or not response.Success then
-        return false
-    end
-
-    local decoded
-    local decodeOk, decodedData = pcall(function()
-        return HttpService:JSONDecode(response.Body)
-    end)
-
-    if not decodeOk then
-        return false
-    end
-
-    decoded = decodedData
-    return decoded and decoded.allowed == true
-end
-
 if not game:IsLoaded() then game.Loaded:Wait() end
-
-if not IsAuthorizedForScript() then
-    if Players.LocalPlayer then
-        Players.LocalPlayer:Kick('you dont have access stfu')
-    end
-    return
-end
 
 local destroy
 destroy = root(function()
